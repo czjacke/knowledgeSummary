@@ -1,0 +1,384 @@
+#鸟哥的私房菜
+
+#精简指令级(Reduced Instruction Set Computer, RISC)
+	微指令集较为精简，每个指令的执行时间都很短，完成的动作也很单纯，指令的执行性能较佳； 但是若要做复杂的事情，就要由多个指令来完成，比如PowerPc、ARM。
+#复杂指令集（Complex Instruction Set Computer, CISC）
+	复杂指令集每个小指令可以执行一些较低阶的硬件操作，指令数目多而且复杂，每条指令的长度并不相同。因为指令执行较为复杂所以每条指令花费的时间较长，但每条个别指令可以处理的工作较为丰富，比如X86。
+	
+#磁盘
+/dev/sd[a-p]	
+
+
+#文件系统与目录树的关系（挂载）
+	“挂载”就是利用一个目录当成进入点，将磁盘分区的数据放置在该目录下； 也就是说，进入该目录就可以读取该分区。
+	根目录一定需要挂载到某个分区的。
+	默认的情况下，Linux是将光驱的数据放置到/media/cdrom里头去的。
+	SATA硬盘：/dev/sd[a-d]
+	CDROM：/dev/cdrom
+	打印机：/dev/lp[0-2]
+	软盘机：/dev/fd[0-1]
+	
+#时间
+	date
+	cal
+Ctr+c  Ctr+d
+[shift]+{[PageUP]|[Page Down]}按键翻页	
+
+#查找指令
+--help,man,/usr/share/doc/
+
+#关机状态查看
+如果要看目前有谁在线上，可以下达“who”
+网络的连线状态，可以下达 “ netstat -a ”
+看背景执行的程序可以执行“ ps -aux ”
+
+#关机指令
+将数据同步写入硬盘中的指令： sync
+惯用的关机指令： shutdown
+重新开机，关机： reboot, halt, poweroff
+
+#文件权限
+/etc/passwd    系统账号，一般身份使用者
+/etc/shadow    个人密码
+/etc/group     群组信息
+
+su -
+ls -al
+
+第一个字符代表这个文件是“目录、文件或链接文件等等”：
+当为[ d ]则是目录，例如上表文件名为“.config”的那一行；
+当为[ - ]则是文件，例如上表文件名为“initial-setup-ks.cfg”那一行；
+若是[ l ]则表示为链接文件（link file）；
+若是[ b ]则表示为设备文件里面的可供储存的周边设备（可随机存取设备）；
+若是[ c ]则表示为设备文件里面的序列埠设备，例如键盘、鼠标（一次性读取设
+备）。
+chgrp ：改变文件所属群组
+	chgrp [-R] dirname/filename
+	chgrp obsgrp root.war
+chown ：改变文件拥有者
+	chown [-R] 帐号名称 文件或目录
+	chown [-R] 帐号名称:群组名称 文件或目录
+	chown obs root.war
+	chown obs:obsgrp root.war 
+chmod ：改变文件的权限, SUID, SGID, SBIT等等的特性
+	chmod [-R] xyz 文件或目录
+	chmod u=rwx,g=rx,o=r filename
+	chmod a-x .bashrc
+	chmod a+x .bashrc
+文件是实际含有数据的地方，包括一般文本文件、数据库内容档、二进制可可执行文件等。	
+
+
+uname -a
+lsb_release  -a
+
+
+#目录配置
+
+. 代表此层目录
+.. 代表上一层目录
+- 代表前一个工作目录
+~ 代表“目前使用者身份”所在的主文件夹
+~account 代表 account 这个使用者的主文件夹（account是个帐号名称）
+
+cd：变换目录
+pwd：显示目前的目录
+mkdir：创建一个新的目录
+rmdir：删除一个空的目录
+
+
+cp(权限属性问题)  -a
+	cp -a /etc /tmp
+	cp -s bashrc bashrc_slink
+	cp -l bashrc bashrc_hlink
+rm
+mv(移动文件与目录，或更名)
+
+rename
+basename
+dirname
+
+
+#文件
+
+cat 由第一行开始显示文件内容
+	cat -An filename
+tac 从最后一行开始显示，可以看出 tac 是 cat 的倒着写！
+nl 显示的时候，顺道输出行号！
+
+less 与 more 类似，但是比 more 更好的是，他可以往前翻页！
+head 只看头几行
+tail 只看尾巴几行
+tail -f  filename
+od 以二进制的方式读取文件内容！
+
+
+touch
+创建一个空的文件；
+将某个文件日期修订为目前 （mtime 与 atime）
+
+#文件默认权限
+umask
+#文件隐藏权限
+
+chattr （设置文件隐藏属性）
+chattr [+-=][ASacdistu] 文件或目录名称
+lsattr （显示文件隐藏属性）
+lsattr [-adR] 文件或目录
+
+
+file 观察文件类型
+文件的基本数据，例如是属于 ASCII 或者是 data 文件，或者是 binary， 且其中有没有使用到动态函数库 （share library） 等等的信息
+
+##指令与文件的搜寻
+which （寻找“可执行文件”）说明：根据“PATH”这个环境变量所规范的路径，去搜寻“可执行文件”的文件名
+type   
+
+whereis （由一些特定的目录中寻找文件文件名）
+
+updatedb：根据 /etc/updatedb.conf 的设置去搜寻系统硬盘内的文件名，并更新
+/var/lib/mlocate 内的数据库文件；
+locate：依据 /var/lib/mlocate 内的数据库记载，找出使用者输入的关键字文件名。
+
+
+find / -name "*passwd*"
+find / -size +1M 找出系统中，大于 1MB 的文件
+find /etc -size +50k -a -size -60M
+find /etc -size +1500k -o -size 0  找出 /etc 下面，容量大于 1500K 以及容量等于 0 的文件：
+
+总结：
+搜寻指令的完整文件名可用 which 或 type ，这两个指令都是通过 PATH 变量来搜寻文件
+名；
+搜寻文件的完整文件名可以使用 whereis 找特定目录或 locate 到数据库去搜寻，而不实
+际搜寻文件系统；
+利用 find 可以加入许多选项来直接查询文件系统，以获得自己想要知道的文件名。
+
+
+##文件系统
+/dev/sd[a-p][1-128]：为实体磁盘的磁盘文件名
+/dev/vd[a-d][1-128]：为虚拟磁盘的磁盘文件名
+
+文件系统通常会将这两部份的数据分别存放在不同的区块，权限与属性放置到 inode 中，至于实际数据则放置到 data block 区块中。 另外，还有一个超级区块（superblock） 会记录整个文件系统的整体信息，包括 inode 与 block 的总量、使用量、剩余量等。
+superblock：记录此 filesystem 的整体信息，包括inode/block的总量、使用量、剩余量，
+以及文件系统的格式与相关信息等；inode：记录文件的属性，一个文件占用一个inode，同时记录此文件的数据所在的 block号码；
+block：实际记录文件的内容，若文件太大时，会占用多个 block 。
+
+
+#
+blkid &lt;==这个指令可以叫出目前系统有被格式化的设备
+dumpe2fs 去查询任何文件系统
+dumpe2fs [-bh] 设备文件名
+xfs_info 挂载点
+
+
+df：列出文件系统的整体磁盘使用量；
+df -hT[a]
+df -hT    /home
+
+du：评估文件系统的磁盘使用量（常用在推估目录所占容量）
+du -h --max-depth=2  /home
+
+du -sh /*
+
+
+
+ln [-sf] 来源文件 目标文件
+选项与参数：
+-s ：如果不加任何参数就进行链接，那就是hard link，至于 -s 就是symbolic link
+-f ：如果 目标文件 存在时，就主动的将目标文件直接移除后再创建！
+
+#磁盘分区挂载
+lsblk 列出系统上的所有磁盘列表
+lsblk -ip
+
+blkid 列出设备的 UUID 等参数
+
+
+MBR 分区表请使用 fdisk 分区， GPT 分区表请使用 gdisk 分区
+要通过 lsblk 或 blkid 先找到磁盘，再用 parted /dev/xxx print 来找出内部的分区表类型，之后才用 gdisk 或 fdisk 来操作系统
+
+XFS 文件系统 mkfs.xfs
+EXT4 文件系统 mkfs.ext4
+
+#文件系统的的挂载
+1、单一文件系统不应该被重复挂载在不同的挂载点（目录）中；
+2、单一目录不应该重复挂载多个文件系统；
+3、要作为挂载点的目录，理论上应该都是空目录才是。
+
+mount -a
+mount [-l]
+mount [-t 文件系统] LABEL='' 挂载点
+mount [-t 文件系统] UUID='' 挂载点 # 鸟哥近期建议用这种方式喔！
+mount [-t 文件系统] 设备文件名 挂载点
+
+
+
+
+
+umount [-fn] 设备文件名或挂载点
+
+#开机自动启动挂载点
+vim /etc/fstab
+开机自动挂载可参考/etc/fstab之设置，设置完毕务必使用 mount -a 测试语法正确否
+
+#创建大文件
+dd if=/dev/zero of=/srv/loopdev bs=1M count=512
+
+
+如果磁盘已无未分区的容量，可以考虑使用大型文件取代磁盘设备的处理方式，通过 dd
+与格式化功能。
+
+
+#文件的压缩打包与备份
+*.Z compress 程序压缩的文件；
+*.zip zip 程序压缩的文件；
+*.gz gzip 程序压缩的文件；
+*.bz2 bzip2 程序压缩的文件；
+*.xz xz 程序压缩的文件；
+*.tar tar 程序打包的数据，并没有压缩过；
+*.tar.gz tar 程序打包的文件，其中并且经过 gzip 的压缩
+*.tar.bz2 tar 程序打包的文件，其中并且经过 bzip2 的压缩
+*.tar.xz tar 程序打包的文件，其中并且经过 xz 的压
+
+
+gzip, zcat/zmore/zless/zgrep
+gzip 可以说是应用度最广的压缩指令了！目前 gzip 可以解开 compress, zip 与 gzip 等软件所压缩的文件。
+
+bzip2, bzcat/bzmore/bzless/bzgrep
+
+xz, xzcat/xzmore/xzless/xzgrep
+
+tar 可以将很多文件“打包”成为一个文件，后来将整个 tar 与压缩的功能结合在一起。
+
+压　缩：tar -jcv -f filename.tar.bz2 要被压缩的文件或目录名称
+查　询：tar -jtv -f filename.tar.bz2
+解压缩：tar -jxv -f filename.tar.bz2 -C 欲解压缩的目录
+
+dd 就是因为不理会文件系统， 单纯有啥纪录啥，因此不论该磁盘内的文件系统你是否认识，它都可以备份、还原的
+
+dd if="input_file" of="output_file" bs="block_size" count="number
+
+dd if=/etc/passwd of=/tmp/passwd.back
+
+
+
+##vim编辑器
+
+#区块选择
+v  将光标经过的字符反白选择
+V  将光标经过的列反白选择
+Ctrl + v  以长方形的方式反白选择区块
+y  将反白的地方复制起来
+d  将反白的地方删除
+p  将刚刚复制的区块，在光标所在的地方复制出来
+
+#多窗口
+键功能:sp[filename]打开一个新窗口，如果有加	filename，	表示在新窗口打开一个新文件，否则表示两个窗口为同一个文件内容（同步显示）。[ctrl]+w+	j[ctrl]+w+↓按键的按法是：先按下	[ctrl]	不放，	再按下	w	后放开所有的按键，然后再按下	j	（或向下方向键），则光标可移动到下方的窗口。[ctrl]+w+	k[ctrl]+w+↑同上，不过光标移动到上面的窗口。[ctrl]+w+q其实就是	:q	结束离开啦！	举例来说，如果我想要结束下方的窗口，那么利用	[ctrl]+w+↓	移动到下方窗口后，按下	:q	即可离开，	也可以按下[ctrl]+w+q	啊！
+
+组合按钮补齐的内容[ctrl]+x	->	[ctrl]+n通过目前正在编辑的这个“文件的内容文字”作为关键字，予以补齐[ctrl]+x	->	[ctrl]+f以当前目录内的“文件名”作为关键字，予以补齐[ctrl]+x	->	[ctrl]+o以扩展名作为语法补充，以	vim	内置的关键字，予以补齐
+
+#环境参数设置
+vim	的环境设置参数
+:set	nu	:set	nonu就是设置与取消行号啊！
+:set	hlsearch	:setnohlsearchhlsearch	就是	high	light	search（高亮度搜寻）。	这个就是设置是否将搜寻的字串反白的设置值。默认值是	hlsearch
+:set	ruler还记得我们提到的右下角的一些状态列说明吗？	这个	ruler	就是在显示或不显示该设置值的啦！
+:syntax	on	:syntaxoff是否依据程序相关语法显示不同颜色？	举例来说，在编辑一个纯文本文件时，如果开头是以	#	开始，那么该列就会变成蓝色。	如果你懂得写程序，那么这个	:syntax	on	还会主动的帮你除错呢！但是，	如果你仅是编写纯文本，要避免颜色对你的屏幕产生的干扰，则可以取消这个设置	。
+
+
+可以使用	iconv	进行文件语系编码的转换
+
+使用	dos2unix	及	unix2dos	可以变更文件每一列的行尾断行字符。
+
+
+
+history -w 立刻将目前的数据写入 histfile 当中
+
+
+source 配置文件文件名
+source 或小数点 （.） 都可以将配置文件的内容读进来目前的 shell 环境中
+
+Ctrl + C 终止目前的命令
+Ctrl + D 输入结束 （EOF），例如邮件结束的时候；
+
+
+bash 符号意义
+* 代表“ 0 个到无穷多个任意字符"
+? 代表“一定有一个任意字符"
+[ ] 同样代表“一定有一个在括号内”的字符（非任意字符）。例如 [abcd] 代表“一定有一个字符， 可能是 a, b, c, d 这四个任何一个”
+[-] 若有减号在中括号内时，代表“在编码顺序内的所有字符”。例如 [0-9] 代表 0 到 9 之间的所有数字，因为数字的语系编码是连续的！
+[^]若中括号内的第一个字符为指数符号 （^） ，那表示“反向选择”，例如 [^abc] 代表一定有一个字符，只要是非 a, b, c 的其他字符就接受的意思。
+
+
+; 连续指令下达分隔符号：连续性命令的界定 （注意！与管线命令并不相同）
+$ 取用变量前置字符：亦即是变量之前需要加的变量取代值
+& 工作控制 （job control）：将指令变成背景下工作
+>, >> 数据流重导向：输出导向，分别是“取代”与“累加”
+<, << 数据流重导向：输入导向 （这两个留待下节介绍）
+' ' 单引号，不具有变量置换的功能 （$ 变为纯文本）
+" " 具有变量置换的功能！ （$ 可保留相关功能）
+``两个“ ` ”中间为可以先执行的指令，亦可使用 $（ ）
+
+1. 标准输入　　（stdin） ：代码为 0 ，使用 < 或 << ；将原本需要由键盘输入的数据，改由文件内容来取代
+2. 标准输出　　（stdout）：代码为 1 ，使用 > 或 >> ；
+3. 标准错误输出（stderr）：代码为 2 ，使用 2> 或 2>> ；
+/dev/null 垃圾桶黑洞设备与特殊写法
+
+
+
+find /home -name  xxx  > list 2>$1
+
+cmd ; cmd （不考虑指令相关性的连续指令下达）
+$? （指令回传值） 与 && 或 ||
+cmd1&&cmd2
+1. 若 cmd1 执行完毕且正确执行（$?=0），则开始执行 cmd2。 2. 若 cmd1
+执行完毕且为错误 （$?≠0），则 cmd2 不执行。
+cmd1 ||cmd2
+1. 若 cmd1 执行完毕且正确执行（$?=0），则 cmd2 不执行。 2. 若 cmd1 执
+行完毕且为错误 （$?≠0），则开始执行 cmd2。
+
+#文本显示
+less, more, head, tail 等都是可以接受 standard input 的管线命令啦
+管线命令仅会处理 standard output，对于 standard error output 会予以忽略
+管线命令必须要能够接受来自前一个指令的数据成为 standard input 继续处理才行。
+
+#文本处理
+grep [-acinv] [--color=auto] '搜寻字串' filename
+选项与参数：
+-a ：将 binary 文件以 text 文件的方式搜寻数据
+-c ：计算找到 '搜寻字串' 的次数
+-i ：忽略大小写的不同，所以大小写视为相同
+-n ：顺便输出行号
+-v ：反向选择，亦即显示出没有 '搜寻字串' 内容的那一行！
+--color=auto ：可以将找到的关键字部分加上颜色的显示喔！
+
+
+
+sort [-fbMnrtuk] [file or stdin]
+选项与参数：
+-f ：忽略大小写的差异，例如 A 与 a 视为编码相同；
+-b ：忽略最前面的空白字符部分；
+-M ：以月份的名字来排序，例如 JAN, DEC 等等的排序方法；
+-n ：使用“纯数字”进行排序（默认是以文字体态来排序的）；
+-r ：反向排序；
+-u ：就是 uniq ，相同的数据中，仅出现一行代表；
+-t ：分隔符号，默认是用 [tab] 键来分隔；
+-k ：以那个区间 （field） 来进行排序的意思
+
+
+
+uniq [-ic]
+选项与参数：
+-i ：忽略大小写字符的不同；
+-c ：进行计数
+
+
+wc [-lwm]
+选项与参数：
+-l ：仅列出行；
+-w ：仅列出多少字（英文单字）；
+-m ：多少字符；
+
+
+tee 会同时将数据流分送到文件去与屏幕 （screen）；而输出到屏幕的，其实就是 stdout
+tee [-a] file
+选项与参数：
+-a ：以累加 （append） 的方式，将数据加入 file 当中！
