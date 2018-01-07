@@ -1,0 +1,136 @@
+#语系对正则表达式的影响
+
+grep -n filename 
+grep -vn filename
+grep -in filename
+grep -n 't[ae]st' regular_express.txt
+grep -n '[^g]oo' regular_express.txt
+
+grep -n '[^a-z]oo$' regular_express.txt
+grep -n '^[^a-zA-Z]' regular_express.txt
+#找出空白行
+grep -n '^$' regular_express.txt
+
+#匹配两个以上的o
+grep -n 'go\{2,\}g' regular_express.txt
+#匹配两到5个o
+grep -n 'go\{2,5\}g' regular_express.txt
+#匹配两个o
+grep -n 'go\{2\}g' regular_express.txt
+
+
+. （小数点）：代表“一定有一个任意字符”的意思；
+*（星星号）：代表“重复前一个字符， 0 到无穷多次
+.* 的 RE 表示任意字符是很常见,. 与 RE 字符及 * 来设置 0 个到无限多个重复字符
+
+
+
+RE 字符意义与范例
+^word 意义：待搜寻的字串（word）在行首！范例：搜寻行首为 # 开始的那一行，并列出行号  grep -n '^#' regular_express.txt
+word$ 意义：待搜寻的字串（word）在行尾！范例：将行尾为 ! 的那一行打印出来，并列出行号 grep -n '!$' regular_express.txt
+.意义：代表“一定有一个任意字符”的字符！范例：搜寻的字串可以是 （eve）（eae） （eee） （e e）， 但不能仅有 （ee） ！亦即 e 与 e 中间“一定”仅有一个字符，而空白字符也是字符！grep -n 'e.e' regular_express.txt
+\ 意义：跳脱字符，将特殊符号的特殊意义去除！范例：搜寻含有单引号 ' 的那一行！ grep -n \' regular_express.txt
+* 意义：重复零个到无穷多个的前一个 RE 字符 范例：找出含有 （es） （ess）（esss） 等等的字串，注意，因为 可以是 0 个，所以 es 也是符合带搜寻字
+串。另外，因为 为重复“前一个 RE 字符”的符号， 因此，在 之前必须要紧接着一个 RE 字符喔！例如任意字符则为 “.” ！ grep -n 'ess*' regular_express.txt
+[list] 意义：字符集合的 RE 字符，里面列出想要撷取的字符！范例：搜寻含有（gl） 或 （gd） 的那一行，需要特别留意的是，在 [] 当中“谨代表一个待搜寻的字符”， 例如“ a[afl]y”代表搜寻的字串可以是 aay, afy, aly 即 [afl] 代表 a 或 f或 l 的意思！grep -n 'g[ld]' regular_express.txt
+[n1-n2] 意义：字符集合的 RE 字符，里面列出想要撷取的字符范围！范例：搜寻含有任意数字的那一行！需特别留意，在字符集合 [] 中的减号 - 是有特殊意义的，他代表两个字符之间的所有连续字符！但这个连续与否与 ASCII 编码有关，因此，你的编码需要设置正确（在 bash 当中，需要确定 LANG 与 LANGUAGE
+的变量是否正确！） 例如所有大写字符则为 [A-Z] grep -n '[A-Z]' regular_express.txt
+[^list] 意义：字符集合的 RE 字符，里面列出不要的字串或范围！范例：搜寻的字串可以是 （oog） （ood） 但不能是 （oot） ，那个 ^ 在 [] 内时，代表的意义是“反向选择”的意思。 例如，我不要大写字符，则为 [^A-Z]。但是，需要特别注意的是，如果以 grep -n [^A-Z] regular_express.txt 来搜寻，却发现该文件内
+的所有行都被列出，为什么？因为这个 [^A-Z] 是“非大写字符”的意思， 因为每一行均有非大写字符，例如第一行的 "Open Source" 就有 p,e,n,o.... 等等的小
+写字 > grep -n 'oo[^t]' regular_express.txt
+{n,m} 意义：连续 n 到 m 个的“前一个 RE 字符” 意义：若为 {n} 则是连续 n 个的前一个 RE 字符， 意义：若是 {n,} 则是连续 n 个以上的前一个 RE 字符！ 范例：在g 与 g 之间有 2 个到 3 个的 o 存在的字串，亦即（goog）（gooog） grep -n 'go\{2,3\}g' regular_express.txt
+
+#注：在万用字符当中的 *代表的是“ 0 ~ 无限多个字符”的意思，但是在正则表达式当中， 则是“重复0 到无穷多个的前一个 RE 字符”的意思
+
+延伸正则表达式
+字符 意义与范例
++ 意义：重复“一个或一个以上”的前一个 RE 字符 范例：搜寻 （god） （good）
+（goood）... 等等的字串。 那个 o+ 代表“一个以上的 o ”所以，下面的执行成果
+会将第 1, 9, 13 行列出来。egrep -n 'go+d' regular_express.txt
+? 意义：“零个或一个”的前一个 RE 字符 范例：搜寻 （gd） （god） 这两个字串。
+那个 o? 代表“空的或 1 个 o ”所以，上面的执行成果会将第 13, 14 行列出来。 有
+没有发现到，这两个案例（ 'go+d' 与 'go?d' ）的结果集合与 'go*d' 相同？ 想想
+看，这是为什么喔！ egrep -n 'go?d' regular_express.txt
+| 意义：用或（ or ）的方式找出数个字串 范例：搜寻 gd 或 good 这两个字串，注
+意，是“或”！ 所以，第 1,9,14 这三行都可以被打印出来喔！那如果还想要找出
+dog 呢？ egrep -n 'gd|good' regular_express.txt
+egrep -n 'gd|good|dog' regular_express.txt
+（） 意义：找出“群组”字串 范例：搜寻 （glad） 或 （good） 这两个字串，因为 g 与
+d 是重复的，所以， 我就可以将 la 与 oo 列于 （ ） 当中，并以 | 来分隔开来，
+就可以啦！ egrep -n 'g（la|oo）d' regular_express.txt
+（）+ 意义：多个重复群组的判别 范例：将“AxyzxyzxyzxyzC”用 echo 叫出，然后再使
+用如下的方法搜寻一下！ echo 'AxyzxyzxyzxyzC' | egrep 'A（xyz）+C'
+
+
+grep 
+满足两个条件
+grep "xxx" filename | grep  “yyy”
+满足一个条件
+grep -e  "xxx"  -e  "yyy" filename
+zgrep "xxx|yyy" filename
+egrep = grep -E
+zgrep
+zgrep --binary-files=text "var" script.tar.gz
+=zcat script.tar.gz |grep -a "var"
+
+
+#文字处理
+sed [-nefr] [动作]选项与参数：
+-n ：使用安静（silent）模式。在一般 sed 的用法中，所有来自 STDIN 的数据一般都会被列出到屏幕上。
+但如果加上 -n 参数后，则只有经过 sed 特殊处理的那一行（或者动作）才会被列出来。
+-e ：直接在命令行界面上进行 sed 的动作编辑；
+-f ：直接将 sed 的动作写在一个文件内， -f filename 则可以执行 filename 内的 sed 动作；
+-r ：sed 的动作支持的是延伸型正则表达式的语法。（默认是基础正则表达式语法）
+-i ：直接修改读取的文件内容，而不是由屏幕输出。
+动作说明： [n1[,n2]]function
+n1, n2 ：不见得会存在，一般代表“选择进行动作的行数”，举例来说，如果我的动作
+是需要在 10 到 20 行之间进行的，则“ 10,20[动作行为] ”
+function 有下面这些咚咚：
+a ：新增， a 的后面可以接字串，而这些字串会在新的一行出现（目前的下一行）～
+c ：取代， c 的后面可以接字串，这些字串可以取代 n1,n2 之间的行！
+d ：删除，因为是删除啊，所以 d 后面通常不接任何咚咚；
+i ：插入， i 的后面可以接字串，而这些字串会在新的一行出现（目前的上一行）；
+p ：打印，亦即将某个选择的数据印出。通常 p 会与参数 sed -n 一起运行～
+s ：取代，可以直接进行取代的工作哩！通常这个 s 的动作可以搭配正则表达式！
+
+将 /etc/passwd 的内容列出并且打印行号，同时，请将第 2~5 行删除
+nl /etc/passwd | sed '2,5d'
+在第二行后（亦即是加在第三行）加上“drink tea?”字样！
+nl /etc/passwd | sed '2a drink tea'
+将第2-5行的内容取代成为“No 2-5 number
+nl /etc/passwd | sed '2,5c No 2-5 number'
+
+#输出到屏幕，部分数据的搜寻并取代的功能
+sed 's/要被取代的字串/新的字串/g'
+
+/sbin/ifconfig eth0 | grep 'inet ' | sed 's/^.*inet //g'
+/sbin/ifconfig eth0 | grep 'inet ' | sed 's/^.*inet //g' | sed 's/ *netmask.*$//g'
+
+#直接修改文件内容
+sed -i 's/\.$/\!/g' regular_express.txt
+sed 直接在 regular_express.txt 最后一行加入“# This is a test”
+sed -i '$a # This is a test' regular_express.txt
+
+printf '打印格式' 实际内容
+选项与参数：
+关于格式方面的几个特殊样式：
+\a 警告声音输出
+\b 倒退键（backspace）
+\f 清除屏幕 （form feed）
+\n 输出新的一行
+\r 亦即 Enter 按键
+\t 水平的 [tab] 按键
+\v 垂直的 [tab] 按键
+\xNN NN 为两位数的数字，可以转换数字成为字符。
+关于 C 程序语言内，常见的变量格式
+%ns 那个 n 是数字， s 代表 string ，亦即多少个字符；
+%ni 那个 n 是数字， i 代表 integer ，亦即多少整数码数；
+%N.nf 那个 n 与 N 都是数字， f 代表 floating （浮点），如果有小数码数，
+假设我共要十个位数，但小数点有两位，即为 %10.2f 啰！
+
+
+
+awk 也是一个非常棒的数据处理工具！相较于 sed 常常作用于一整个行的处理， awk 则比较倾向于一行当中分成数个“字段”来处理。因此，awk 相当的适合处理小型的数据数据处理
+awk 后面接两个单引号并加上大括号 {} 来设置想要对数据进行的处理动作。 awk 可以处理后
+续接的文件，也可以读取来自前个指令的 standard output 。 但如前面说的， awk 主要是处
+理“每一行的字段内的数据”，而默认的“字段的分隔符号为 "空白键" 或 "[tab]键" ”！
