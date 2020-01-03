@@ -1,0 +1,20 @@
+slf4j 日志框架代码走读总结
+org.slf4j.Logger
+org.slf4j.ILoggerFactory
+	
+
+slf4j可以对接 log4j, logback and JDK 1.4 logging org.slf4j.impl.NOPLogger org.slf4j.impl.SimpleLogger 这些日志系统	
+对接log4j的时候使用findPossibleStaticLoggerBinderPathSet去类路径中查找org/slf4j/impl/StaticLoggerBinder.class(具体的使用通过ClassLoader在classpath中查找资源"org/slf4j/impl/StaticLoggerBinder.class")，找到之后，使用StaticLoggerBinder.getSingleton()就将org/slf4j/impl/StaticLoggerBinder.class这个类加载到jvm中，将log4j和slf4j进行了桥接。Log4jLoggerAdapter是对LogManager.getLogger()返回的Logger的封装。
+
+
+log4j日志实现框架走读总结
+org.apache.log4j.LogManager#getLoggerRepository
+
+org.apache.log4j.Appender
+	--| org.apache.log4j.WriterAppender
+		--| org.apache.log4j.ConsoleAppender
+		--| org.apache.log4j.FileAppender
+			--| org.apache.log4j.DailyRollingFileAppender  //Is is possible to specify monthly, weekly, half-daily, daily,hourly, or minutely rollover schedules
+			--| RollingFileAppender //RollingFileAppender extends FileAppender to backup the log files when they reach a certain size
+				
+	--| org.apache.log4j.AsyncAppender
